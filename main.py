@@ -45,6 +45,12 @@ class TB67S249FTG:
         self.ENABLE = ENABLE
         self.DIR = DIR
         self.direction = None
+        self.LO1 = LO1
+        self.LO2 = LO2
+        self.AGC0 = AGC0
+        self.AGC1 = AGC1
+        gpio.setwarnings(False)
+        gpio.setmode(gpio.BCM)
 
     def turning_direction(self, direction: _direction = "CW", args=_direction):
         exist_direction = get_args(args)
@@ -52,8 +58,21 @@ class TB67S249FTG:
         self.direction = direction
 
     def base_config(self):
-	gpio.setup(self.DMODE0, gpio.OUT)
-        pass
+        gpio.setup(self.DMODE0, gpio.OUT)
+        gpio.setup(self.DMODE1, gpio.OUT)
+        gpio.setup(self.DMODE2, gpio.OUT)
+        gpio.setup(self.CLK, gpio.OUT)
+        gpio.setup(self.DIR, gpio.OUT)
+        gpio.setup(self.ENABLE, gpio.OUT)
+        if self.LO1 is not None:
+            gpio.setup(self.LO1, gpio.IN)
+        if self.LO2 is not None:
+            gpio.setup(self.LO2, gpio.IN)
+        if self.AGC0 is not None:
+            gpio.setup(self.AGC0, gpio.OUT)
+        if self.AGC1 is not None:
+            gpio.setup(self.AGC1, gpio.OUT)
+
 
 
 
