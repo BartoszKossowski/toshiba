@@ -64,6 +64,7 @@ class TB67S249FTG:
         exist_direction = get_args(args)
         assert direction in exist_direction, f"'{direction}' is not in {exist_direction}"
         self.direction = self.direction_set[direction]
+        gpio.output(self.DIR, self.direction)
 
     def base_config(self):
         gpio.setup(self.DMODE0, self.output)
