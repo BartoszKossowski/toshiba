@@ -1,6 +1,7 @@
 #!/usr/bin/python
 
 from typing import Literal, get_args
+import RPi.GPIO as gpio
 
 """
 main.py to będzie główny blok do zarządzania
@@ -51,6 +52,7 @@ class TB67S249FTG:
         self.direction = direction
 
     def base_config(self):
+	gpio.setup(self.DMODE0, gpio.OUT)
         pass
 
 
