@@ -36,6 +36,7 @@ class TB67S249FTG:
     """
 
     _direction = Literal["CW", "CCW"]
+    _resolution = Literal["1/1", "1/2a", "1/2b", "1/4", "1/8", "1/16", "1/32"]
 
     def __init__(self, DMODE0, DMODE1, DMODE2, CLK, ENABLE, DIR, LO1=None, LO2=None, AGC0=None, AGC1=None):
         self.DMODE0 = DMODE0
@@ -44,18 +45,22 @@ class TB67S249FTG:
         self.CLK = CLK
         self.ENABLE = ENABLE
         self.DIR = DIR
-        self.direction = None
         self.LO1 = LO1
         self.LO2 = LO2
         self.AGC0 = AGC0
         self.AGC1 = AGC1
+        self.low = gpio.LOW
+        self.high = gpio.HIGH
+        self.direction_set = {"CW": self.high,
+                              "CCW": self.low}
+        self.direction = self.direction_set["CW"]
         gpio.setwarnings(False)
         gpio.setmode(gpio.BCM)
 
     def turning_direction(self, direction: _direction = "CW", args=_direction):
         exist_direction = get_args(args)
-        assert direction in exist_direction, f"'{direction} is not in {exist_direction}'"
-        self.direction = direction
+        assert direction in exist_direction, f"'{direction}' is not in {exist_direction}"
+        self.direction = self.direction_set[direction]
 
     def base_config(self):
         gpio.setup(self.DMODE0, gpio.OUT)
@@ -73,9 +78,35 @@ class TB67S249FTG:
         if self.AGC1 is not None:
             gpio.setup(self.AGC1, gpio.OUT)
 
+    def mode(self, resolution: _resolution = "1/1", args=_resolution):
+        exist_mode = get_args(args)
+        assert resolution in exist_mode, f"'{resolution}' is not in {exist_mode}"
+        if resolution == "1/1":
+            gpio.output(self.DMODE0, self.low)
+            gpio.output(self.DMODE1, self.low)
+            gpio.output(self.DMODE2, self.high)
+        if resolution == "1/2a":
+            gpio.output(self.DMODE0, self.low)
+            gpio.output(self.DMODE1, self.high)
+            gpio.output(self.DMODE2, self.low)
+        if resolution == "1/2b":
+            gpio.output(self.DMODE0, self.high)
+            gpio.output(self.DMODE1, self.low)
+            gpio.output(self.DMODE2, self.low)
+        if resolution == "1/4":
+            gpio.output(self.DMODE0, self.low)
+            gpio.output(self.DMODE1, self.high)
+            gpio.output(self.DMODE2, self.high)
+        if resolution == "1/8":
+            gpio.output(self.DMODE0, self.high)
+            gpio.output(self.DMODE1, self.low)
+            gpio.output(self.DMODE2, self.high)
+        if resolution == "1/16":
+            gpio.output(self.DMODE0, self.high)
+            gpio.output(self.DMODE1, self.high)
+            gpio.output(self.DMODE2, self.low)
+        if resolution == "1/32":
+            gpio.output(self.DMODE0, self.high)
+            gpio.output(self.DMODE1, self.high)
+            gpio.output(self.DMODE2, self.high)
 
-
-
-
-
-print("moje hocki klocki")
