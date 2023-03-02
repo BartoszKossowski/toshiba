@@ -56,17 +56,8 @@ class TB67S249FTG:
         self.direction_set = {"CW": self.high,
                               "CCW": self.low}
         self.direction = self.direction_set["CW"]
-        gpio.setwarnings(False)
-        gpio.setmode(gpio.BCM)
 
-
-    def turning_direction(self, direction: _direction = "CW", args=_direction):
-        exist_direction = get_args(args)
-        assert direction in exist_direction, f"'{direction}' is not in {exist_direction}"
-        self.direction = self.direction_set[direction]
-        gpio.output(self.DIR, self.direction)
-
-    def base_config(self):
+        # wycięte z base_config()
         gpio.setup(self.DMODE0, self.output)
         gpio.setup(self.DMODE1, self.output)
         gpio.setup(self.DMODE2, self.output)
@@ -81,6 +72,19 @@ class TB67S249FTG:
             gpio.setup(self.AGC0, self.output)
         if self.AGC1 is not None:
             gpio.setup(self.AGC1, self.output)
+
+        gpio.setwarnings(False)
+        gpio.setmode(gpio.BCM)
+
+
+    def turning_direction(self, direction: _direction = "CW", args=_direction):
+        exist_direction = get_args(args)
+        assert direction in exist_direction, f"'{direction}' is not in {exist_direction}"
+        self.direction = self.direction_set[direction]
+        gpio.output(self.DIR, self.direction)
+
+    def base_config(self):
+        pass
 
     def mode(self, resolution: _resolution = "1/1", args=_resolution):
         exist_mode = get_args(args)
