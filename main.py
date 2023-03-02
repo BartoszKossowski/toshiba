@@ -90,7 +90,7 @@ class TB67S249FTG:
                 print("Detect over current (ISD)")
             if not gpio.input(self.LO1) and not gpio.input(self.LO2):
                 print("Detect over thermal (TSD)")
-                func()
+            func()
             return detect_flag()
 
     def turning_direction(self, direction: _direction = "CW", args=_direction):
