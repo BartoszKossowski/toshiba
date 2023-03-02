@@ -76,6 +76,22 @@ class TB67S249FTG:
         if self.AGC1 is not None:
             gpio.setup(self.AGC1, self.output)
 
+        gpio.output(self.DIR, self.direction)
+        gpio.output(self.ENABLE, self.low)
+        gpio.output(self.DMODE0, self.low)
+        gpio.output(self.DMODE1, self.low)
+        gpio.output(self.DMODE2, self.high)
+
+    def _errors(self, func):
+        def detect_flag():
+            if gpio.input(self.LO1):
+                print("Detected motor load open (OPD)")
+            if gpio.input(self.LO2):
+                print("Detect over current (ISD)")
+            if not gpio.input(self.LO1) and not gpio.input(self.LO2):
+                print("Detect over thermal (TSD)")
+                func()
+            return detect_flag()
 
     def turning_direction(self, direction: _direction = "CW", args=_direction):
         exist_direction = get_args(args)
@@ -118,3 +134,13 @@ class TB67S249FTG:
             gpio.output(self.DMODE1, self.high)
             gpio.output(self.DMODE2, self.high)
 
+    def enable(self):
+        gpio.output(self.ENABLE, self.high)
+
+    def disable(self):
+        gpio.output(self.ENABLE, self.low)
+
+    @_errors
+    def rotation(self):
+        gpio.output(self.CLK, self.high)
+        gpio.output(self.CLK, self.low)
