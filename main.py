@@ -127,7 +127,7 @@ class TB67S249FTG (_error_handler):
     _direction = Literal["CW", "CCW"]
     _resolution = Literal["1/1", "1/2a", "1/2b", "1/4", "1/8", "1/16", "1/32"]
 
-    def __init__(self, DMODE0, DMODE1, DMODE2, CLK, ENABLE, DIR, LO1, LO2, AGC0, AGC1):
+    def __init__(self, DMODE0, DMODE1, DMODE2, CLK, ENABLE, DIR, LO1, LO2, AGC0, AGC1, ELO1=None, ELO2=None, ELO3=None):
         super().__init__(LO1, LO2, AGC0, AGC1, ELO1=None, ELO2=None, ELO3=None)
         self.DMODE0 = DMODE0
         self.DMODE1 = DMODE1
