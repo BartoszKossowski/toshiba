@@ -3,16 +3,56 @@
 from typing import Literal, get_args
 import RPi.GPIO as gpio
 
+
 """
 main.py to będzie główny blok do zarządzania
 początek jest jaki jest bo będzie to na linuxa
 i to na razie na tyle będzie z tego, czas lutować i pomału zapisywać co będzie potrzebne do odbierania a co do nadawania sygnału
 
 Tutaj stworzymy bibliotekę do sterowania hardware-owo sterownikiem
+
+03.03.2023
+Trzeba przebudować aplikację, aby błędy można było ładować jako jeden moduł i w razie błędu sygnalizować go jakoś - do tego utworzymy inną klasę (do błędów) i wykonamy dziedziczenie klas
 """
 
 
-class TB67S249FTG:
+# def _errors(func):
+#     def detect_flag():
+#         if gpio.input(self.LO1) and not gpio.input(self.LO2):
+#             print("Detected motor load open (OPD)")
+#         if gpio.input(self.LO2) and not gpio.input(self.LO1):
+#             print("Detect over current (ISD)")
+#         if not gpio.input(self.LO1) and not gpio.input(self.LO2):
+#             print("Detect over thermal (TSD)")
+#
+#     return detect_flag()
+
+
+class _error_handler:
+    def __init__(self, LO1, LO2, AGC0, AGC1):
+        self.LO1 = LO1
+        self.LO2 = LO2
+        self.AGC0 = AGC0
+        self.AGC1 = AGC1
+        if self.LO1 is not None:
+            gpio.setup(self.LO1, self.input)
+        if self.LO2 is not None:
+            gpio.setup(self.LO2, self.input)
+        if self.AGC0 is not None:
+            gpio.setup(self.AGC0, self.output)
+        if self.AGC1 is not None:
+            gpio.setup(self.AGC1, self.output)
+
+    def detect_flag(self):
+        if gpio.input(self.LO1) and not gpio.input(self.LO2):
+            print("Detected motor load open (OPD)")
+        if gpio.input(self.LO2) and not gpio.input(self.LO1):
+            print("Detect over current (ISD)")
+        if not gpio.input(self.LO1) and not gpio.input(self.LO2):
+            print("Detect over thermal (TSD)")
+
+
+class TB67S249FTG (_error_handler):
 
     # constans
     """
@@ -38,17 +78,14 @@ class TB67S249FTG:
     _direction = Literal["CW", "CCW"]
     _resolution = Literal["1/1", "1/2a", "1/2b", "1/4", "1/8", "1/16", "1/32"]
 
-    def __init__(self, DMODE0, DMODE1, DMODE2, CLK, ENABLE, DIR, LO1=None, LO2=None, AGC0=None, AGC1=None):
+    def __init__(self, DMODE0, DMODE1, DMODE2, CLK, ENABLE, DIR, LO1, LO2, AGC0, AGC1):
+        super().__init__(LO1, LO2, AGC0, AGC1)
         self.DMODE0 = DMODE0
         self.DMODE1 = DMODE1
         self.DMODE2 = DMODE2
         self.CLK = CLK
         self.ENABLE = ENABLE
         self.DIR = DIR
-        self.LO1 = LO1
-        self.LO2 = LO2
-        self.AGC0 = AGC0
-        self.AGC1 = AGC1
         self.output = gpio.OUT
         self.input = gpio.IN
         self.low = gpio.LOW
@@ -60,38 +97,18 @@ class TB67S249FTG:
         gpio.setwarnings(False)
         gpio.setmode(gpio.BCM)
 
-        # wycięte z base_config()
         gpio.setup(self.DMODE0, self.output)
         gpio.setup(self.DMODE1, self.output)
         gpio.setup(self.DMODE2, self.output)
         gpio.setup(self.CLK, self.output)
         gpio.setup(self.DIR, self.output)
         gpio.setup(self.ENABLE, self.output)
-        if self.LO1 is not None:
-            gpio.setup(self.LO1, self.input)
-        if self.LO2 is not None:
-            gpio.setup(self.LO2, self.input)
-        if self.AGC0 is not None:
-            gpio.setup(self.AGC0, self.output)
-        if self.AGC1 is not None:
-            gpio.setup(self.AGC1, self.output)
 
         gpio.output(self.DIR, self.direction)
         gpio.output(self.ENABLE, self.low)
         gpio.output(self.DMODE0, self.low)
         gpio.output(self.DMODE1, self.low)
         gpio.output(self.DMODE2, self.high)
-
-    def _errors(self, func=None):
-        def detect_flag(*args, **kwargs):
-            if gpio.input(self.LO1) and not gpio.input(self.LO2):
-                print("Detected motor load open (OPD)")
-            if gpio.input(self.LO2) and not gpio.input(self.LO1):
-                print("Detect over current (ISD)")
-            if not gpio.input(self.LO1) and not gpio.input(self.LO2):
-                print("Detect over thermal (TSD)")
-            func(*args, **kwargs)
-        return detect_flag()
 
     def turning_direction(self, direction: _direction = "CW", args=_direction):
         exist_direction = get_args(args)
@@ -137,7 +154,7 @@ class TB67S249FTG:
     def disable(self):
         gpio.output(self.ENABLE, self.low)
 
-    @_errors
     def rotation(self):
         gpio.output(self.CLK, self.high)
         gpio.output(self.CLK, self.low)
+
