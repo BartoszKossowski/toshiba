@@ -142,9 +142,9 @@ class TB67S249FTG:
 
     # @_errors
     def rotation(self):
-        if gpio.input(self.LO1):
+        if gpio.input(self.LO1) and not gpio.input(self.LO2):
             print("Detected motor load open (OPD)")
-        if gpio.input(self.LO2):
+        if gpio.input(self.LO2) and not gpio.input(self.LO1):
             print("Detect over current (ISD)")
         if not gpio.input(self.LO1) and not gpio.input(self.LO2):
             print("Detect over thermal (TSD)")
