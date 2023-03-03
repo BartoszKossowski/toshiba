@@ -65,25 +65,34 @@ class _error_handler:
             gpio.setup(self.AGC1, self.output)
 
     def detect_flag(self):
+        elo1 = False
+        elo2 = False
+        elo3 = False
         if gpio.input(self.LO1) and not gpio.input(self.LO2):
             if self.elo:
+                elo1 = True
                 _error_handler.opd_on(self)
         else:
-            if self.elo:
+            if elo1:
+                elo1 = False
                 _error_handler.opd_off(self)
 
         if gpio.input(self.LO2) and not gpio.input(self.LO1):
             if self.elo:
+                elo2 = True
                 _error_handler.isd_on(self)
         else:
-            if self.elo:
+            if elo2:
+                elo2 = False
                 _error_handler.isd_off(self)
 
         if not gpio.input(self.LO1) and not gpio.input(self.LO2):
             if self.elo:
+                elo3 = True
                 _error_handler.tsd_on(self)
         else:
-            if self.elo:
+            if elo3:
+                elo3 = False
                 _error_handler.tsd_off(self)
 
     def opd_on(self):
