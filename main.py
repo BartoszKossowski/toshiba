@@ -31,9 +31,9 @@ class _error_handler:
         self.input = gpio.IN
         self.low = gpio.LOW
         self.high = gpio.HIGH
-        self.check_elo1 = False
-        self.check_elo2 = False
-        self.check_elo3 = False
+        self.check_elo1 = bool
+        self.check_elo2 = bool
+        self.check_elo3 = bool
         gpio.setwarnings(False)
         gpio.setmode(gpio.BCM)
 
