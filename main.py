@@ -12,43 +12,38 @@ i to na razie na tyle będzie z tego, czas lutować i pomału zapisywać co będ
 Tutaj stworzymy bibliotekę do sterowania hardware-owo sterownikiem
 
 03.03.2023
-Trzeba przebudować aplikację, aby błędy można było ładować jako jeden moduł i w razie błędu sygnalizować go jakoś - do tego utworzymy inną klasę (do błędów) i wykonamy dziedziczenie klas
+Trzeba przebudować aplikację, aby błędy można było ładować jako jeden moduł i w razie błędu sygnalizować go jakoś.
+Do tego utworzymy inną klasę (do błędów) i wykonamy dziedziczenie klas
 """
 
 
-# def _errors(func):
-#     def detect_flag():
-#         if gpio.input(self.LO1) and not gpio.input(self.LO2):
-#             print("Detected motor load open (OPD)")
-#         if gpio.input(self.LO2) and not gpio.input(self.LO1):
-#             print("Detect over current (ISD)")
-#         if not gpio.input(self.LO1) and not gpio.input(self.LO2):
-#             print("Detect over thermal (TSD)")
-#
-#     return detect_flag()
-
-
 class _error_handler:
-    def __init__(self, LO1, LO2, AGC0, AGC1, ELO1=None, ELO2=None):
+    def __init__(self, LO1, LO2, AGC0, AGC1, ELO1=None, ELO2=None, ELO3=None):
         self.LO1 = LO1
         self.LO2 = LO2
         self.AGC0 = AGC0
         self.AGC1 = AGC1
         self.elo1 = ELO1
         self.elo2 = ELO2
+        self.elo3 = ELO3
         self.elo = bool
         self.output = gpio.OUT
         self.input = gpio.IN
+        self.low = gpio.LOW
+        self.high = gpio.HIGH
         gpio.setwarnings(False)
         gpio.setmode(gpio.BCM)
 
-        if (self.elo1 is None and self.elo2 is not None) or (self.elo2 is None and self.elo1 is not None):
+        if (self.elo1 is None and self.elo2 is not None and self.elo3 is not None)\
+                or (self.elo2 is None and self.elo1 is not None and self.elo3 is not None)\
+                or (self.elo3 is None and self.elo1 is not None and self.elo2 is not None):
             raise AssertionError("All errors pins must be assignment")
 
-        if self.elo2 and self.elo1:
+        if self.elo2 is not None and self.elo1 is not None and self.elo3 is not None:
             self.elo = True
             gpio.setup(self.elo1, self.output)
             gpio.setup(self.elo2, self.output)
+            gpio.setup(self.elo3, self.elo3)
 
         if self.LO1 is not None:
             gpio.setup(self.LO1, self.input)
@@ -61,14 +56,49 @@ class _error_handler:
 
     def detect_flag(self):
         if gpio.input(self.LO1) and not gpio.input(self.LO2):
-            print("Detected motor load open (OPD)")
-        if gpio.input(self.LO2) and not gpio.input(self.LO1):
-            print("Detect over current (ISD)")
-        if not gpio.input(self.LO1) and not gpio.input(self.LO2):
-            print("Detect over thermal (TSD)")
+            if self.elo:
+                _error_handler.opd_on(self)
+        else:
+            if self.elo:
+                _error_handler.opd_off(self)
 
-    def error_out(self):
-        pass
+        if gpio.input(self.LO2) and not gpio.input(self.LO1):
+            if self.elo:
+                _error_handler.isd_on(self)
+        else:
+            if self.elo:
+                _error_handler.isd_off(self)
+
+        if not gpio.input(self.LO1) and not gpio.input(self.LO2):
+            if self.elo:
+                _error_handler.tsd_on(self)
+        else:
+            if self.elo:
+                _error_handler.tsd_off(self)
+
+    def opd_on(self):
+        gpio.output(self.elo1, self.high)
+        print("Detected motor load open (OPD ON)")
+
+    def opd_off(self):
+        gpio.output(self.elo1, self.low)
+        print("Detected motor load closed (OPD OFF)")
+
+    def isd_on(self):
+        gpio.output(self.elo2, self.high)
+        print("Detect over current (ISD ON)")
+
+    def isd_off(self):
+        gpio.output(self.elo2, self.low)
+        print("Detect over current (ISD OFF)")
+
+    def tsd_on(self):
+        gpio.output(self.elo3, self.high)
+        print("Detect over thermal (TSD ON)")
+
+    def tsd_off(self):
+        gpio.output(self.elo3, self.low)
+        print("Detect over thermal (TSD OFF)")
 
 
 class TB67S249FTG (_error_handler):
