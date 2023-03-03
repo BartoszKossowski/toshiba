@@ -42,7 +42,7 @@ class _error_handler:
         gpio.setwarnings(False)
         gpio.setmode(gpio.BCM)
 
-        assert (self.elo1 and not self.elo2) or (self.elo2 and not self.elo1), f"All errors pins must be assigment"
+        assert (self.elo1 is None and self.elo2 is not None) or (self.elo2 is None and self.elo1 is not None), f"All errors pins must be assigment"
         if self.elo2 and self.elo1:
             self.elo = True
             gpio.setup(self.elo1, self.output)
