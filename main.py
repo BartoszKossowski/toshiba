@@ -29,15 +29,24 @@ Trzeba przebudować aplikację, aby błędy można było ładować jako jeden mo
 
 
 class _error_handler:
-    def __init__(self, LO1, LO2, AGC0, AGC1):
+    def __init__(self, LO1, LO2, AGC0, AGC1, ELO1=None, ELO2=None):
         self.LO1 = LO1
         self.LO2 = LO2
         self.AGC0 = AGC0
         self.AGC1 = AGC1
+        self.elo1 = ELO1
+        self.elo2 = ELO2
+        self.elo = bool
         self.output = gpio.OUT
         self.input = gpio.IN
         gpio.setwarnings(False)
         gpio.setmode(gpio.BCM)
+
+        assert (self.elo1 and not self.elo2) or (self.elo2 and not self.elo1), f"All errors pins must be assigment"
+        if self.elo2 and self.elo1:
+            self.elo = True
+            gpio.setup(self.elo1, self.output)
+            gpio.setup(self.elo2, self.output)
 
         if self.LO1 is not None:
             gpio.setup(self.LO1, self.input)
@@ -55,6 +64,9 @@ class _error_handler:
             print("Detect over current (ISD)")
         if not gpio.input(self.LO1) and not gpio.input(self.LO2):
             print("Detect over thermal (TSD)")
+
+    def error_out(self):
+        pass
 
 
 class TB67S249FTG (_error_handler):
