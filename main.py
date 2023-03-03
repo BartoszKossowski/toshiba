@@ -42,7 +42,9 @@ class _error_handler:
         gpio.setwarnings(False)
         gpio.setmode(gpio.BCM)
 
-        assert (self.elo1 is None and self.elo2 is not None) or (self.elo2 is None and self.elo1 is not None), f"All errors pins must be assigment"
+        if (self.elo1 is None and self.elo2 is not None) or (self.elo2 is None and self.elo1 is not None):
+            raise AssertionError("All errors pins must be assignment")
+
         if self.elo2 and self.elo1:
             self.elo = True
             gpio.setup(self.elo1, self.output)
@@ -175,4 +177,3 @@ class TB67S249FTG (_error_handler):
         _error_handler.detect_flag(self)
         gpio.output(self.CLK, self.high)
         gpio.output(self.CLK, self.low)
-
