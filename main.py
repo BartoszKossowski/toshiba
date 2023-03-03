@@ -34,6 +34,8 @@ class _error_handler:
         self.LO2 = LO2
         self.AGC0 = AGC0
         self.AGC1 = AGC1
+        self.output = gpio.OUT
+        self.input = gpio.IN
         if self.LO1 is not None:
             gpio.setup(self.LO1, self.input)
         if self.LO2 is not None:
@@ -155,6 +157,7 @@ class TB67S249FTG (_error_handler):
         gpio.output(self.ENABLE, self.low)
 
     def rotation(self):
+        _error_handler.detect_flag(self)
         gpio.output(self.CLK, self.high)
         gpio.output(self.CLK, self.low)
 
