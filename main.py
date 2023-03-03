@@ -82,7 +82,7 @@ class TB67S249FTG:
         gpio.output(self.DMODE1, self.low)
         gpio.output(self.DMODE2, self.high)
 
-    def _errors(self, func):
+    def _errors(self, func=None):
         def detect_flag(*args, **kwargs):
             if gpio.input(self.LO1) and not gpio.input(self.LO2):
                 print("Detected motor load open (OPD)")
@@ -98,9 +98,6 @@ class TB67S249FTG:
         assert direction in exist_direction, f"'{direction}' is not in {exist_direction}"
         self.direction = self.direction_set[direction]
         gpio.output(self.DIR, self.direction)
-
-    def base_config(self):
-        pass
 
     def mode(self, resolution: _resolution = "1/1", args=_resolution):
         exist_mode = get_args(args)
