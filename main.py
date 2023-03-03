@@ -36,6 +36,7 @@ class _error_handler:
         self.AGC1 = AGC1
         self.output = gpio.OUT
         self.input = gpio.IN
+        gpio.setmode(gpio.BCM)
         if self.LO1 is not None:
             gpio.setup(self.LO1, self.input)
         if self.LO2 is not None:
