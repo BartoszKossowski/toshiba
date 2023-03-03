@@ -68,9 +68,6 @@ class _error_handler:
             gpio.setup(self.AGC1, self.output)
 
     def detect_flag(self):
-        self.check_elo1 = False
-        self.check_elo2 = False
-        self.check_elo3 = False
         if gpio.input(self.LO1) and not gpio.input(self.LO2):
             if self.elo:
                 self.check_elo1 = True
