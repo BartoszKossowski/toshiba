@@ -41,18 +41,9 @@ class _error_handler:
                 or (self.elo2 is None and self.elo1 is not None and self.elo3 is not None)\
                 or (self.elo3 is None and self.elo1 is not None and self.elo2 is not None):
             raise AssertionError("All errors pins must be assignment")
-        print("przed ifem do ustalania numerów pinów na wyjście")
-        print(f"To są nasze piny odpowiednio: \n"
-              f"{self.elo1} pin błędu pierwszego \n"
-              f"{self.elo2} pin błędu drugiego \n"
-              f"{self.elo3} pin błędu trzeciego")
+
         if self.elo2 is not None and self.elo1 is not None and self.elo3 is not None:
             self.elo = True
-            print("weszliśmy do ifa")
-            print(f"To są nasze piny odpowiednio: \n"
-                  f"{self.elo1} pin błędu pierwszego \n"
-                  f"{self.elo2} pin błędu drugiego \n"
-                  f"{self.elo3} pin błędu trzeciego")
 
             gpio.setup(self.elo1, self.output)
             gpio.setup(self.elo2, self.output)
