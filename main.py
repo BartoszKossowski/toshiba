@@ -217,3 +217,11 @@ class TB67S249FTG (_error_handler):
         _error_handler.detect_flag(self)
         gpio.output(self.CLK, self.high)
         gpio.output(self.CLK, self.low)
+
+    def up(self):
+        _error_handler.detect_flag(self)
+        gpio.output(self.CLK, self.high)
+
+    def down(self):
+        _error_handler.detect_flag(self)
+        gpio.output(self.CLK, self.low)
