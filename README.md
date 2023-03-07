@@ -47,7 +47,8 @@ for cycle in range(1000):
     test.up()  # CLK pin set high
     time.sleep(.0002)
     test.down()  # CLK pin set down
-    
+
+test.disable()
 ```
 
 If there are any errors on pins LO1/LO2, then:
