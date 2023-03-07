@@ -1,6 +1,7 @@
 #!/usr/bin/python
 
 from typing import Literal, get_args
+from time import sleep
 import RPi.GPIO as gpio
 
 
@@ -144,8 +145,9 @@ class TB67S249FTG (_error_handler):
     _direction = Literal["CW", "CCW"]
     _resolution = Literal["1/1", "1/2a", "1/2b", "1/4", "1/8", "1/16", "1/32"]
 
-    def __init__(self, DMODE0, DMODE1, DMODE2, CLK, ENABLE, DIR, LO1, LO2, AGC0, AGC1, ELO1=None, ELO2=None, ELO3=None):
+    def __init__(self, DMODE0, DMODE1, DMODE2, CLK, ENABLE, DIR, LO1, LO2, AGC0, AGC1, pwm=None, ELO1=None, ELO2=None, ELO3=None):
         super().__init__(LO1, LO2, AGC0, AGC1, ELO1, ELO2, ELO3)
+        self.pwm = pwm
         self.DMODE0 = DMODE0
         self.DMODE1 = DMODE1
         self.DMODE2 = DMODE2
@@ -163,6 +165,9 @@ class TB67S249FTG (_error_handler):
         gpio.setwarnings(False)
         gpio.setmode(gpio.BCM)
 
+        if self.pwm is not None:
+            gpio.setup(self.pwm, self.output)
+
         gpio.setup(self.DMODE0, self.output)
         gpio.setup(self.DMODE1, self.output)
         gpio.setup(self.DMODE2, self.output)
@@ -175,7 +180,6 @@ class TB67S249FTG (_error_handler):
         gpio.output(self.DMODE0, self.low)
         gpio.output(self.DMODE1, self.low)
         gpio.output(self.DMODE2, self.high)
-
 
     def turning_direction(self, direction: _direction = "CW", args=_direction):
         exist_direction = get_args(args)
@@ -235,24 +239,10 @@ class TB67S249FTG (_error_handler):
     def down(self):
         _error_handler.detect_flag(self)
         gpio.output(self.CLK, self.low)
-<<<<<<< HEAD
     
-    def pwm(self):
-        gpio.setup(12, self.output)
-        pwm = gpio.PWM(12, 1000)
-        pwm.start(0)
-        for duty in range(0, 101, 1):
-            pwm.ChangeDutyCycle(duty)
-            time.sleep(0.05)
+    def pwm(self, hz):
+        pwm = gpio.PWM(self.pwm, hz)
+        pwm.start(100)
         print("Zrobione")
-    
-=======
 
-    def up(self):
-        _error_handler.detect_flag(self)
-        gpio.output(self.CLK, self.high)
 
-    def down(self):
-        _error_handler.detect_flag(self)
-        gpio.output(self.CLK, self.low)
->>>>>>> 70d5543a05ec1f2cd0a7818934f7d004ada48aee
