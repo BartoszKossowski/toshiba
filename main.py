@@ -241,7 +241,8 @@ class TB67S249FTG (_error_handler):
         gpio.output(self.CLK, self.low)
     
     def pwm(self, hz):
-        pwm = gpio.PWM(self.pwm, hz)
+        pwm_hz = hz
+        pwm = gpio.PWM(self.pwm, pwm_hz)
         pwm.start(100)
         print("Zrobione")
 
