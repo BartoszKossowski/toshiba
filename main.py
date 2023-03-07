@@ -245,4 +245,6 @@ class TB67S249FTG (_error_handler):
         pwm.start(99)
         print("Zrobione")
 
-
+    def close_rpi_code(self):
+        gpio.cleanup()
+        exit()
