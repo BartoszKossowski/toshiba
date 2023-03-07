@@ -63,28 +63,35 @@ class _error_handler:
             if self.elo:
                 self.check_elo1 = True
                 _error_handler.opd_on(self)
+                return
         else:
             if self.check_elo1:
                 self.check_elo1 = False
                 _error_handler.opd_off(self)
+                return
 
         if gpio.input(self.LO2) and not gpio.input(self.LO1):
             if self.elo:
                 self.check_elo2 = True
                 _error_handler.isd_on(self)
+                return
         else:
             if self.check_elo2:
                 self.check_elo2 = False
                 _error_handler.isd_off(self)
+                return
 
         if not gpio.input(self.LO1) and not gpio.input(self.LO2):
             if self.elo:
                 self.check_elo3 = True
                 _error_handler.tsd_on(self)
+                return
         else:
             if self.check_elo3:
                 self.check_elo3 = False
                 _error_handler.tsd_off(self)
+                return
+        return
 
     def opd_on(self):
         gpio.output(self.elo1, self.high)
@@ -169,6 +176,7 @@ class TB67S249FTG (_error_handler):
         gpio.output(self.DMODE1, self.low)
         gpio.output(self.DMODE2, self.high)
 
+
     def turning_direction(self, direction: _direction = "CW", args=_direction):
         exist_direction = get_args(args)
         assert direction in exist_direction, f"'{direction}' is not in {exist_direction}"
@@ -214,6 +222,26 @@ class TB67S249FTG (_error_handler):
         gpio.output(self.ENABLE, self.low)
 
     def rotation(self):
+        print("ello")
         _error_handler.detect_flag(self)
         gpio.output(self.CLK, self.high)
+        print("wchodze w to")
         gpio.output(self.CLK, self.low)
+    
+    def up(self):
+        _error_handler.detect_flag(self)
+        gpio.output(self.CLK, self.high)
+    
+    def down(self):
+        _error_handler.detect_flag(self)
+        gpio.output(self.CLK, self.low)
+    
+    def pwm(self):
+        gpio.setup(12, self.output)
+        pwm = gpio.PWM(12, 1000)
+        pwm.start(0)
+        for duty in range(0, 101, 1):
+            pwm.ChangeDutyCycle(duty)
+            time.sleep(0.05)
+        print("Zrobione")
+    
