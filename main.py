@@ -235,6 +235,7 @@ class TB67S249FTG (_error_handler):
     def down(self):
         _error_handler.detect_flag(self)
         gpio.output(self.CLK, self.low)
+<<<<<<< HEAD
     
     def pwm(self):
         gpio.setup(12, self.output)
@@ -245,3 +246,13 @@ class TB67S249FTG (_error_handler):
             time.sleep(0.05)
         print("Zrobione")
     
+=======
+
+    def up(self):
+        _error_handler.detect_flag(self)
+        gpio.output(self.CLK, self.high)
+
+    def down(self):
+        _error_handler.detect_flag(self)
+        gpio.output(self.CLK, self.low)
+>>>>>>> 70d5543a05ec1f2cd0a7818934f7d004ada48aee
